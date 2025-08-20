@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Trò chơi Toán học</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container" id="container">
+      <header>
+        <h1>🎮 Trò chơi Toán học</h1>
+        <div class="badge" aria-live="polite" aria-atomic="true">
+          <div class="chip">Chơi vui • Học tốt</div>
+        </div>
+      </header>
+
+      <main>
+        <section id="setup" class="card" aria-label="Thiết lập trò chơi">
+          <div class="grid">
+            <div>
+              <label>Phép tính:</label>
+              <div id="operationGroup" class="op-group">
+                <label
+                  ><input type="checkbox" value="add" checked /> Cộng (+)</label
+                >
+                <label><input type="checkbox" value="sub" /> Trừ (−)</label>
+                <label><input type="checkbox" value="mul" /> Nhân (×)</label>
+                <label><input type="checkbox" value="div" /> Chia (÷)</label>
+              </div>
+            </div>
+
+            <div>
+              <label>Chế độ:</label>
+              <select id="mode" onchange="toggleModeOptions()">
+                <option value="input">Tự luận</option>
+                <option value="mcq">Trắc nghiệm</option>
+              </select>
+
+              <div id="mcqOptions" style="display: none; margin-top: 10px">
+                <label>Số lượng đáp án:</label>
+                <input
+                  type="number"
+                  id="optionCount"
+                  value="4"
+                  min="2"
+                  max="8"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label>Giới hạn toán hạng (VD: 0 - 100):</label>
+              <div style="display: flex; gap: 10px">
+                <input type="number" id="minNum" placeholder="Min" value="0" />
+                <input
+                  type="number"
+                  id="maxNum"
+                  placeholder="Max"
+                  value="100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label>Giới hạn kết quả (tuỳ chọn):</label>
+              <div style="display: flex; gap: 10px">
+                <input type="number" id="minRes" placeholder="Min" />
+                <input type="number" id="maxRes" placeholder="Max" />
+              </div>
+            </div>
+
+            <div>
+              <label>Thời gian/câu (giây):</label>
+              <input
+                type="number"
+                id="timeLimit"
+                placeholder="VD: 5"
+                value="5"
+              />
+            </div>
+
+            <div>
+              <label>Kiểu hiển thị câu hỏi:</label>
+              <select id="questionPresentation">
+                <option value="text" selected>Văn bản</option>
+                <option value="audio">Audio (đọc thành tiếng)</option>
+              </select>
+              <div class="hidenn" style="margin-top: 10px">
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-weight: 600;
+                  "
+                >
+                  <input type="checkbox" id="hideTextWhenAudio" /> Ẩn văn bản
+                  câu hỏi khi phát audio
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label>Chế độ đặc biệt:</label>
+              <div class="op-group" style="grid-template-columns: 1fr">
+                <label style="display: flex; align-items: center; gap: 8px">
+                  <input type="checkbox" id="viewOnly" /> Chỉ xem câu hỏi (nhấn
+                  Enter để hiện đáp án, sau đó tự chuyển câu)
+                </label>
+              </div>
+            </div>
+
+            <!-- Thêm: chơi nâng cao -->
+            <div>
+              <label>Chế độ nâng cao:</label>
+              <div style="display: grid; gap: 8px">
+                <label
+                  style="
+                    font-weight: 600;
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
+                  "
+                >
+                  <input type="checkbox" id="advancedMode" /> Bật chơi nâng cao
+                </label>
+                <div style="display: flex; gap: 8px">
+                  <label style="flex: 1">
+                    Mỗi đúng bao nhiêu câu tăng level:
+                    <input type="number" id="levelUpEvery" value="10" min="1" />
+                  </label>
+                  <label style="flex: 1">
+                    Tăng range mỗi lần:
+                    <select id="levelUpIncrement">
+                      <option value="50">+50</option>
+                      <option value="100">+100</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap"
+          >
+            <button class="btn" onclick="startGame()">Bắt đầu</button>
+          </div>
+        </section>
+
+        <section id="game" class="card" aria-live="polite" aria-atomic="true">
+          <div class="statusbar">
+            <div class="timer-wrap" style="flex: 1">
+              <div class="timer-bar" id="timerBar"></div>
+            </div>
+            <div class="score-chip" id="timerText">⏱ 0 giây</div>
+            <div class="score-chip" id="score">Điểm: 0</div>
+
+            <div id="audioState" style="display: none; margin-left: auto">
+              <div
+                class="controls"
+                style="display: inline-flex; gap: 8px; margin-left: 12px"
+              >
+                <button
+                  id="repeatBtn"
+                  onclick="repeatAudio()"
+                  style="width: 8vw"
+                >
+                  Nghe lại
+                </button>
+                <button
+                  id="toggleQBtn"
+                  onclick="toggleQuestion()"
+                  style="width: 8vw"
+                >
+                  Ẩn câu hỏi
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="question" id="question"></div>
+          <div class="subnote" id="subnote"></div>
+
+          <div class="controls">
+            <div id="inputMode">
+              <input type="number" id="answer" placeholder="Nhập kết quả" />
+              <button class="btn" id="submitBtn" onclick="onSubmitInput()">
+                Trả lời
+              </button>
+            </div>
+
+            <div id="mcqMode" class="options"></div>
+
+            <div class="end" id="end"></div>
+
+            <div class="footer-actions">
+              <button class="btn-ghost" onclick="restartGame()">
+                🔄 Chơi lại
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
