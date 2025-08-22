@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trò chơi Toán học — UI Tinh chỉnh</title>
+
+    <!-- Font: Inter + Poppins cho độ đọc tốt trên giao diện -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Poppins:wght@600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* === Root theme variables (thay đổi bằng JS) === */
+      :root {
+        --primary: #e91e63; /* chính */
+        --secondary: #ff8fb3; /* phụ */
+        --bg-1: rgba(255, 228, 239, 0.14);
+        --bg-2: rgba(255, 244, 247, 0.06);
+        --surface: #ffffff; /* nền card */
+        --text: #0f1724; /* văn bản chính */
+        --muted: #6b7280; /* văn bản phụ */
+        --success: #16a34a;
+        --danger: #dc2626;
+        --glass: rgba(255, 255, 255, 0.6);
+        --shadow: 0 12px 40px rgba(8, 15, 30, 0.12);
+        --radius-lg: 20px;
+        --radius-md: 12px;
+        --radius-sm: 10px;
+        --focus-ring: 0 0 0 6px rgba(233, 30, 99, 0.1);
+      }
+
+      /* === Reset + base === */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: var(--text);
+        background: radial-gradient(
+            800px 380px at 8% 12%,
+            var(--bg-1) 0%,
+            rgba(255, 255, 255, 0) 40%
+          ),
+          radial-gradient(
+            700px 360px at 92% 18%,
+            var(--bg-2) 0%,
+            rgba(255, 255, 255, 0) 45%
+          );
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      /* container */
+      .container {
+        width: min(100%, 1100px);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.82),
+          rgba(255, 255, 255, 0.95)
+        );
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: box-shadow 0.25s ease, transform 0.15s ease;
+      }
+      .container:hover {
+        transform: translateY(-4px);
+      }
+
+      /* header */
+      header {
+        padding: 22px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        color: white;
+      }
+      header h1 {
+        margin: 0;
+        font-family: Poppins, Inter;
+        font-weight: 700;
+        font-size: clamp(20px, 2.6vw, 32px);
+        letter-spacing: 0.2px;
+      }
+      .chip {
+        margin-left: auto;
+        background: rgba(255, 255, 255, 0.14);
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-weight: 700;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+      .card {
+        padding: 20px 24px;
+        background: transparent;
+      }
+
+      /* Setup grid */
+      #setup .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        align-items: start;
+      }
+      label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .panel {
+        background: var(--surface);
+        border-radius: var(--radius-md);
+        padding: 14px;
+        border: 1px solid rgba(15, 23, 36, 0.04);
+        box-shadow: 0 8px 22px rgba(15, 23, 36, 0.04);
+      }
+
+      .op-group {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 240, 246, 0.9),
+          rgba(255, 250, 251, 0.7)
+        );
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px dashed rgba(255, 192, 214, 0.45);
+      }
+      .op-group label {
+        font-weight: 600;
+      }
+
+      input[type="number"],
+      input[type="color"],
+      select,
+      button {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(15, 23, 36, 0.06);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.9),
+          rgba(248, 248, 249, 0.9)
+        );
+        font-size: 15px;
+        color: var(--text);
+        outline: none;
+      }
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      input:focus,
+      select:focus,
+      button:focus {
+        box-shadow: var(--focus-ring);
+        border-color: rgba(0, 0, 0, 0.06);
+      }
+
+      .small {
+        font-size: 13px;
+        padding: 8px;
+      }
+
+      .controls {
+        display: grid;
+        gap: 12px;
+      }
+
+      .btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 11px 14px;
+        border-radius: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 0.08s ease, box-shadow 0.12s ease;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(14, 22, 36, 0.08);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid rgba(15, 23, 36, 0.06);
+        color: var(--text);
+        font-weight: 700;
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      /* Game area */
+      #game {
+        display: none;
+        padding: 18px 24px;
+      }
+      .statusbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .score-chip {
+        background: rgba(15, 23, 36, 0.04);
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-weight: 700;
+      }
+      .timer-wrap {
+        width: 100%;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 230, 240, 0.6),
+          rgba(255, 240, 245, 0.6)
+        );
+        height: 14px;
+        border-radius: 999px;
+        overflow: hidden;
+        border: 1px solid rgba(15, 23, 36, 0.02);
+      }
+      .timer-bar {
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transform-origin: left center;
+        transition: width 0.2s linear;
+      }
+
+      .question {
+        font-size: clamp(26px, 5.4vw, 56px);
+        text-align: center;
+        font-weight: 800;
+        margin: 6px 12px 0;
+      }
+      .subnote {
+        text-align: center;
+        color: var(--muted);
+        min-height: 22px;
+      }
+
+      #inputMode {
+        display: flex;
+        gap: 12px;
+        max-width: 720px;
+        margin: 0 auto;
+      }
+      #inputMode input {
+        flex: 1;
+        font-size: 20px;
+        text-align: center;
+        border-radius: 12px;
+      }
+
+      .options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        padding: 0 6px 6px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .option-btn {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 241, 247, 0.95),
+          rgba(255, 250, 252, 0.9)
+        );
+        border: 1px solid rgba(255, 193, 214, 0.45);
+        padding: 14px;
+        border-radius: 14px;
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: 800;
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        align-items: center;
+        gap: 12px;
+      }
+      .option-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 46px rgba(15, 23, 36, 0.06);
+      }
+      .op-index {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 230, 240, 1),
+          rgba(255, 210, 230, 1)
+        );
+        font-weight: 800;
+        color: var(--text);
+      }
+
+      .footer-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        padding: 10px;
+      }
+
+      .disabled {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      /* responsive */
+      @media (max-width: 980px) {
+        #setup .grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 720px) {
+        #setup .grid {
+          grid-template-columns: 1fr;
+        }
+        .options {
+          grid-template-columns: 1fr;
+        }
+        #inputMode {
+          flex-direction: column;
+        }
+      }
+
+      /* small visual helpers */
+      .muted {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .theme-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .color-swatch {
+        width: 36px;
+        height: 22px;
+        border-radius: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container" id="container">
+      <header>
+        <h1>🎮 Trò chơi Toán học</h1>
+        <div class="chip">Chơi vui • Học tốt</div>
+      </header>
+
+      <main>
+        <section id="setup" class="card">
+          <div class="grid">
+            <div class="panel">
+              <label>Phép tính</label>
+              <div class="op-group" id="operationGroup">
+                <label
+                  ><input type="checkbox" value="add" checked /> Cộng (+)</label
+                >
+                <label><input type="checkbox" value="sub" /> Trừ (−)</label>
+                <label><input type="checkbox" value="mul" /> Nhân (×)</label>
+                <label><input type="checkbox" value="div" /> Chia (÷)</label>
+              </div>
+
+              <div style="margin-top: 12px">
+                <label>Phép toán có nhớ</label>
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <label style="display: flex; align-items: center; gap: 8px"
+                    ><input type="checkbox" id="withCarry" /> Cho phép có
+                    nhớ</label
+                  >
+                  <small id="carryHint" class="muted"
+                    >(tự động disable nếu phạm vi không phù hợp)</small
+                  >
+                </div>
+              </div>
+
+              <div style="margin-top: 12px">
+                <label>Phép chia</label>
+                <div style="display: flex; gap: 12px">
+                  <label style="display: flex; align-items: center; gap: 8px"
+                    ><input type="radio" name="divMode" value="any" checked />
+                    Cho phép dư</label
+                  >
+                  <label style="display: flex; align-items: center; gap: 8px"
+                    ><input type="radio" name="divMode" value="exact" /> Chia
+                    hết</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <label>Chế độ</label>
+              <select id="mode">
+                <option value="input">Tự luận</option>
+                <option value="mcq">Trắc nghiệm</option>
+              </select>
+
+              <div style="margin-top: 12px">
+                <label>Số lượng đáp án</label>
+                <input
+                  type="number"
+                  id="optionCount"
+                  value="4"
+                  min="2"
+                  max="8"
+                />
+                <div class="muted" style="margin-top: 6px">
+                  (Chỉ dùng khi chọn Trắc nghiệm)
+                </div>
+              </div>
+
+              <div style="margin-top: 12px">
+                <label>Kiểu câu hỏi</label>
+                <select id="questionPresentation">
+                  <option value="text">Văn bản</option>
+                  <option value="audio">Audio (đọc thành tiếng)</option>
+                </select>
+
+                <div style="margin-top: 8px">
+                  <label style="display: flex; align-items: center; gap: 8px"
+                    ><input type="checkbox" id="hideTextWhenAudio" /> Ẩn văn bản
+                    khi phát audio</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <label>Phạm vi & thời gian</label>
+              <div style="display: grid; gap: 10px">
+                <div style="display: flex; gap: 10px">
+                  <div style="flex: 1">
+                    <label class="muted">Toán hạng 1 (min)</label
+                    ><input type="number" id="minNum1" value="0" />
+                  </div>
+                  <div style="flex: 1">
+                    <label class="muted">Toán hạng 1 (max)</label
+                    ><input type="number" id="maxNum1" value="100" />
+                  </div>
+                </div>
+                <div style="display: flex; gap: 10px">
+                  <div style="flex: 1">
+                    <label class="muted">Toán hạng 2 (min)</label
+                    ><input type="number" id="minNum2" value="0" />
+                  </div>
+                  <div style="flex: 1">
+                    <label class="muted">Toán hạng 2 (max)</label
+                    ><input type="number" id="maxNum2" value="100" />
+                  </div>
+                </div>
+                <div style="display: flex; gap: 10px">
+                  <div style="flex: 1">
+                    <label class="muted">Kết quả (min)</label
+                    ><input type="number" id="minRes" />
+                  </div>
+                  <div style="flex: 1">
+                    <label class="muted">Kết quả (max)</label
+                    ><input type="number" id="maxRes" />
+                  </div>
+                </div>
+                <div>
+                  <label class="muted">Thời gian / câu (giây)</label
+                  ><input type="number" id="timeLimit" value="5" />
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <label>Chế độ nâng cao</label>
+              <div style="display: grid; gap: 10px">
+                <label style="display: flex; align-items: center; gap: 8px"
+                  ><input type="checkbox" id="advancedMode" /> Bật chơi nâng
+                  cao</label
+                >
+                <div style="display: flex; gap: 8px">
+                  <input
+                    type="number"
+                    id="levelUpEvery"
+                    value="10"
+                    class="small"
+                  />
+                  <select id="levelUpIncrement" class="small">
+                    <option value="50">+50</option>
+                    <option value="100">+100</option>
+                  </select>
+                </div>
+
+                <label style="margin-top: 6px">Chủ đề màu</label>
+                <div class="theme-row">
+                  <select id="themeSelect" class="small">
+                    <option value="default">Hồng (mặc định)</option>
+                    <option value="blue">Xanh biển</option>
+                    <option value="green">Xanh lá</option>
+                    <option value="custom">Người dùng</option>
+                  </select>
+                  <div
+                    id="customColors"
+                    style="display: none; gap: 6px; align-items: center"
+                  >
+                    <input type="color" id="customPrimary" value="#1e90ff" />
+                    <input type="color" id="customSecondary" value="#7dd3fc" />
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: 8px">
+                  <button class="btn" id="applyThemeBtn">Áp dụng chủ đề</button>
+                  <button class="btn-ghost" onclick="resetSettings()">
+                    Khôi phục mặc định
+                  </button>
+                </div>
+
+                <div class="muted">
+                  Ghi chú: Các thiết lập luôn hiển thị; khi bắt đầu chơi sẽ bị
+                  khóa để tránh thay đổi.
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="panel"
+              style="
+                grid-column: span 3;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+              "
+            >
+              <div>
+                <div style="font-weight: 800; margin-bottom: 6px">
+                  Sẵn sàng?
+                </div>
+                <div class="muted">
+                  Nhấn Bắt đầu để vào chế độ chơi. Bạn vẫn có thể thay chủ đề
+                  mọi lúc.
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px">
+                <button class="btn" onclick="startGame()">Bắt đầu</button>
+                <button class="btn-ghost" onclick="restartGame()">
+                  Thoát game
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="game"
+          class="card panel"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <div class="statusbar">
+            <div class="timer-wrap" style="flex: 1">
+              <div class="timer-bar" id="timerBar"></div>
+            </div>
+            <div class="score-chip" id="timerText">⏱ 0 giây</div>
+            <div class="score-chip" id="score">Điểm: 0</div>
+            <div id="audioState" style="display: none; margin-left: auto">
+              <div style="display: inline-flex; gap: 8px">
+                <button
+                  class="btn-ghost"
+                  id="repeatBtn"
+                  onclick="repeatAudio()"
+                >
+                  Nghe lại
+                </button>
+                <button
+                  class="btn-ghost"
+                  id="toggleQBtn"
+                  onclick="toggleQuestion()"
+                >
+                  Ẩn câu hỏi
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="question" id="question">—</div>
+          <div class="subnote" id="subnote"></div>
+
+          <div class="controls">
+            <div id="inputMode">
+              <input type="number" id="answer" placeholder="Nhập kết quả" />
+              <button class="btn" id="submitBtn" onclick="onSubmitInput()">
+                Trả lời
+              </button>
+            </div>
+
+            <div id="mcqMode" class="options" aria-hidden="true"></div>
+
+            <div class="end" id="end"></div>
+
+            <div class="footer-actions">
+              <button class="btn-ghost" onclick="startGame()">
+                🔄 Chơi lại
+              </button>
+              <button class="btn-ghost" onclick="restartGame()">
+                Thoát game
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      // --- Elements ---
+      const modeEl = document.getElementById("mode");
+      const optionCountEl = document.getElementById("optionCount");
+      const questionPresentationEl = document.getElementById(
+        "questionPresentation"
+      );
+      const hideTextWhenAudioEl = document.getElementById("hideTextWhenAudio");
+      const minNum1El = document.getElementById("minNum1");
+      const maxNum1El = document.getElementById("maxNum1");
+      const minNum2El = document.getElementById("minNum2");
+      const maxNum2El = document.getElementById("maxNum2");
+      const withCarryEl = document.getElementById("withCarry");
+      const carryHintEl = document.getElementById("carryHint");
+      const opGroup = document.getElementById("operationGroup");
+      const themeSelect = document.getElementById("themeSelect");
+      const customColors = document.getElementById("customColors");
+      const customPrimary = document.getElementById("customPrimary");
+      const customSecondary = document.getElementById("customSecondary");
+      const applyThemeBtn = document.getElementById("applyThemeBtn");
+
+      // init
+      function init() {
+        modeEl.addEventListener("change", updateModeRelated);
+        questionPresentationEl.addEventListener(
+          "change",
+          updatePresentationRelated
+        );
+        minNum1El.addEventListener("input", updateCarryAvailability);
+        maxNum1El.addEventListener("input", updateCarryAvailability);
+        minNum2El.addEventListener("input", updateCarryAvailability);
+        maxNum2El.addEventListener("input", updateCarryAvailability);
+        opGroup
+          .querySelectorAll("input[type=checkbox]")
+          .forEach((chk) =>
+            chk.addEventListener("change", updateCarryAvailability)
+          );
+        themeSelect.addEventListener("change", onThemeChange);
+        applyThemeBtn.addEventListener("click", applyTheme);
+        updateModeRelated();
+        updatePresentationRelated();
+        updateCarryAvailability();
+        applyTheme();
+      }
+
+      // Keep controls visible but disable when not applicable
+      function updateModeRelated() {
+        if (modeEl.value === "input") {
+          optionCountEl.disabled = true;
+          optionCountEl.classList.add("disabled");
+        } else {
+          optionCountEl.disabled = false;
+          optionCountEl.classList.remove("disabled");
+        }
+      }
+
+      function updatePresentationRelated() {
+        if (questionPresentationEl.value === "text") {
+          hideTextWhenAudioEl.disabled = true;
+          hideTextWhenAudioEl.checked = false;
+          document.getElementById("audioState").style.display = "none";
+        } else {
+          hideTextWhenAudioEl.disabled = false;
+          document.getElementById("audioState").style.display = "block";
+        }
+      }
+
+      // carry availability logic (simple, safe)
+      function updateCarryAvailability() {
+        const min1 = parseInt(minNum1El.value || 0);
+        const max1 = parseInt(maxNum1El.value || 0);
+        const min2 = parseInt(minNum2El.value || 0);
+        const max2 = parseInt(maxNum2El.value || 0);
+        const ops = Array.from(opGroup.querySelectorAll("input[type=checkbox]"))
+          .filter((c) => c.checked)
+          .map((c) => c.value);
+        let canCarry = false;
+        if (ops.includes("add") && max1 + max2 >= 10) canCarry = true;
+        if (!canCarry && ops.includes("sub") && min1 < max2) canCarry = true;
+        if (!canCarry && ops.includes("mul") && (max1 >= 10 || max2 >= 10))
+          canCarry = true;
+        if (canCarry) {
+          withCarryEl.disabled = false;
+          carryHintEl.textContent = "(có thể bật/tắt)";
+        } else {
+          withCarryEl.checked = false;
+          withCarryEl.disabled = true;
+          carryHintEl.textContent = "(không áp dụng với phạm vi hiện tại)";
+        }
+      }
+
+      // theme handlers: apply variables broadly including background
+      function onThemeChange() {
+        customColors.style.display =
+          themeSelect.value === "custom" ? "flex" : "none";
+      }
+      function applyTheme(e) {
+        if (e) e.preventDefault();
+        if (themeSelect.value === "blue") {
+          setThemeVars("#0ea5e9", "#7dd3fc", "#e6f7ff", "#f4fbff", "#05204a");
+        } else if (themeSelect.value === "green") {
+          setThemeVars("#10b981", "#bbf7d0", "#e8fbf0", "#f3fff7", "#052014");
+        } else if (themeSelect.value === "custom") {
+          setThemeVars(
+            customPrimary.value,
+            customSecondary.value,
+            "rgba(0,0,0,0.03)",
+            "rgba(255,255,255,0.95)",
+            "var(--text)"
+          );
+        } else {
+          setThemeVars(
+            "#e91e63",
+            "#ff8fb3",
+            "rgba(255,228,239,0.14)",
+            "rgba(255,244,247,0.06)",
+            "var(--text)"
+          );
+        }
+      }
+      function setThemeVars(p, s, bg1, bg2, textColor) {
+        document.documentElement.style.setProperty("--primary", p);
+        document.documentElement.style.setProperty("--secondary", s);
+        document.documentElement.style.setProperty("--bg-1", bg1);
+        document.documentElement.style.setProperty("--bg-2", bg2);
+        if (textColor)
+          document.documentElement.style.setProperty("--text", textColor);
+        // also update header gradient and body background quickly
+        document.querySelector(
+          "header"
+        ).style.background = `linear-gradient(135deg, ${p} 0%, ${s} 100%)`;
+        document.body.style.background = `radial-gradient(800px 380px at 8% 12%, ${bg1} 0%, rgba(255,255,255,0) 40%), radial-gradient(700px 360px at 92% 18%, ${bg2} 0%, rgba(255,255,255,0) 45%)`;
+      }
+
+      // --- Game control scaffold ---
+      function disableSettings(disable) {
+        document
+          .querySelectorAll("#setup input, #setup select, #setup button")
+          .forEach((el) => {
+            if (el.id === "applyThemeBtn") return; // vẫn cho phép thay đổi màu
+            el.disabled = disable;
+            if (disable) el.classList.add("disabled");
+            else el.classList.remove("disabled");
+          });
+      }
+
+      function startGame() {
+        disableSettings(true);
+        document.getElementById("setup").style.display = "none";
+        document.getElementById("game").style.display = "block";
+        if (modeEl.value === "input") {
+          document.getElementById("inputMode").style.display = "flex";
+          document.getElementById("mcqMode").style.display = "none";
+        } else {
+          document.getElementById("inputMode").style.display = "none";
+          document.getElementById("mcqMode").style.display = "grid";
+          generateMCQPlaceholders();
+        }
+        updatePresentationRelated();
+        document.getElementById("timerText").textContent = `⏱ ${parseInt(
+          document.getElementById("timeLimit").value || 5
+        )} giây`;
+        nextQuestion();
+      }
+      function restartGame() {
+        document.getElementById("game").style.display = "none";
+        document.getElementById("setup").style.display = "block";
+        disableSettings(false);
+        document.getElementById("score").textContent = "Điểm: 0";
+        document.getElementById("question").textContent = "—";
+        document.getElementById("subnote").textContent = "";
+      }
+
+      function resetSettings() {
+        modeEl.value = "input";
+        optionCountEl.value = 4;
+        questionPresentationEl.value = "text";
+        hideTextWhenAudioEl.checked = false;
+        minNum1El.value = 0;
+        maxNum1El.value = 100;
+        minNum2El.value = 0;
+        maxNum2El.value = 100;
+        withCarryEl.checked = false;
+        themeSelect.value = "default";
+        onThemeChange();
+        applyTheme();
+        updateModeRelated();
+        updatePresentationRelated();
+        updateCarryAvailability();
+      }
+
+      function generateMCQPlaceholders() {
+        const mcq = document.getElementById("mcqMode");
+        mcq.innerHTML = "";
+        const count = Math.max(
+          2,
+          Math.min(8, parseInt(optionCountEl.value || 4))
+        );
+        for (let i = 1; i <= count; i++) {
+          const btn = document.createElement("button");
+          btn.className = "option-btn";
+          btn.innerHTML = `<div class="op-index">${i}</div><div>Đáp án ${i}</div>`;
+          btn.onclick = () => onMCQSelect(i);
+          mcq.appendChild(btn);
+        }
+      }
+
+      function onSubmitInput() {
+        const ans = document.getElementById("answer").value;
+        document.getElementById("subnote").textContent = `Bạn trả lời: ${ans}`;
+        setTimeout(nextQuestion, 600);
+      }
+      function onMCQSelect(i) {
+        document.getElementById("subnote").textContent = `Bạn chọn đáp án ${i}`;
+        setTimeout(nextQuestion, 600);
+      }
+
+      function nextQuestion() {
+        const ops = Array.from(opGroup.querySelectorAll("input[type=checkbox]"))
+          .filter((c) => c.checked)
+          .map((c) => c.value);
+        if (ops.length === 0) {
+          document.getElementById("question").textContent =
+            "Vui lòng chọn ít nhất 1 phép tính";
+          return;
+        }
+        const op = ops[Math.floor(Math.random() * ops.length)];
+        const min1 = parseInt(minNum1El.value || 0);
+        const max1 = parseInt(maxNum1El.value || 10);
+        const min2 = parseInt(minNum2El.value || 0);
+        const max2 = parseInt(maxNum2El.value || 10);
+        let a = randInt(min1, max1);
+        let b = randInt(min2, max2);
+        const divMode = document.querySelector(
+          "input[name=divMode]:checked"
+        ).value;
+        if (op === "div") {
+          if (divMode === "exact") {
+            b = randInt(Math.max(1, min2), Math.max(1, max2));
+            const q = randInt(min1, max1);
+            a = b * q;
+          } else {
+            b = randInt(Math.max(1, min2), Math.max(1, max2));
+            a = randInt(min1, max1);
+          }
+        }
+        const show =
+          questionPresentationEl.value === "audio" &&
+          hideTextWhenAudioEl.checked
+            ? "[Audio phát]"
+            : `${a} ${symbol(op)} ${b}`;
+        document.getElementById("question").textContent = show;
+        document.getElementById("subnote").textContent = withCarryEl.checked
+          ? "Yêu cầu: có nhớ"
+          : "";
+        if (modeEl.value === "mcq") generateMCQPlaceholders();
+      }
+
+      function symbol(op) {
+        return op === "add"
+          ? "+"
+          : op === "sub"
+          ? "−"
+          : op === "mul"
+          ? "×"
+          : "÷";
+      }
+      function randInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function repeatAudio() {
+        alert("Phát lại audio (chưa triển khai)");
+      }
+      function toggleQuestion() {
+        const q = document.getElementById("question");
+        q.style.visibility =
+          q.style.visibility === "hidden" ? "visible" : "hidden";
+      }
+
+      // kickstart
+      init();
+    </script>
+  </body>
+</html>

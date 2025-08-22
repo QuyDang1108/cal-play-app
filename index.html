@@ -50,12 +50,25 @@
             </div>
 
             <div>
-              <label>Giới hạn toán hạng (VD: 0 - 100):</label>
+              <label>Giới hạn toán hạng thứ nhất:</label>
               <div style="display: flex; gap: 10px">
-                <input type="number" id="minNum" placeholder="Min" value="0" />
+                <input type="number" id="minNum1" placeholder="Min" value="0" />
                 <input
                   type="number"
-                  id="maxNum"
+                  id="maxNum1"
+                  placeholder="Max"
+                  value="100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label>Giới hạn toán hạng thứ hai:</label>
+              <div style="display: flex; gap: 10px">
+                <input type="number" id="minNum2" placeholder="Min" value="0" />
+                <input
+                  type="number"
+                  id="maxNum2"
                   placeholder="Max"
                   value="100"
                 />
@@ -196,8 +209,11 @@
             <div class="end" id="end"></div>
 
             <div class="footer-actions">
-              <button class="btn-ghost" onclick="restartGame()">
+              <button class="btn-ghost" onclick="startGame()">
                 🔄 Chơi lại
+              </button>
+              <button class="btn-ghost" onclick="restartGame()">
+                Thoát game
               </button>
             </div>
           </div>

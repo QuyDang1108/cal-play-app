@@ -13,8 +13,10 @@ defaultPointsPerCorrect: 1,
 // Trạng thái toàn cục
 // =========================
 let operations,
-minNum,
-maxNum,
+minNum1,
+maxNum1,
+minNum2,
+maxNum2,
 minRes,
 maxRes,
 timeLimit,
@@ -87,8 +89,10 @@ operations = Array.from(
 mode = document.getElementById("mode").value;
 optionCount =
     parseInt(document.getElementById("optionCount").value) || 4;
-minNum = parseInt(document.getElementById("minNum").value) || 0;
-maxNum = parseInt(document.getElementById("maxNum").value) || 100;
+minNum1 = parseInt(document.getElementById("minNum1").value) || 0;
+maxNum1 = parseInt(document.getElementById("maxNum1").value) || 100;
+minNum2 = parseInt(document.getElementById("minNum2").value) || 0;
+maxNum2 = parseInt(document.getElementById("maxNum2").value) || 100;
 minRes = document.getElementById("minRes").value
     ? parseInt(document.getElementById("minRes").value)
     : null;
@@ -105,7 +109,11 @@ if (operations.length === 0) {
     alert("Chọn ít nhất 1 phép toán!");
     return false;
 }
-if (minNum > maxNum) {
+if (minNum1 > maxNum1) {
+    alert("Min phải nhỏ hơn hoặc bằng Max!");
+    return false;
+}
+if (minNum2 > maxNum2) {
     alert("Min phải nhỏ hơn hoặc bằng Max!");
     return false;
 }
@@ -132,8 +140,8 @@ function generateQuestion() {
 let op = operations[Math.floor(Math.random() * operations.length)];
 let a, b, res, symbol;
 while (true) {
-    a = rand(minNum, maxNum);
-    b = rand(minNum, maxNum);
+    a = rand(minNum1, maxNum1);
+    b = rand(minNum2, maxNum2);
     switch (op) {
     case "add":
         res = a + b;
