@@ -13,8 +13,11 @@
         <div class="badge" aria-live="polite" aria-atomic="true">
           <div class="chip">Chơi vui • Học tốt</div>
         </div>
-      </header>
 
+        <!-- ĐỒNG HỒ TỔNG THỜI GIAN (thêm vào góc trên phải) -->
+        
+      </header>
+<div id="totalTimer" class="total-timer" aria-live="polite">⏲ Tổng: 0:00</div>
       <main>
         <section id="setup" class="card" aria-label="Thiết lập trò chơi">
           <div class="grid">
@@ -37,7 +40,7 @@
                 <option value="mcq">Trắc nghiệm</option>
               </select>
 
-              <div id="mcqOptions" style="display: none; margin-top: 10px">
+              <div id="mcqOptions" style="margin-top: 10px">
                 <label>Số lượng đáp án:</label>
                 <input
                   type="number"

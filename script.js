@@ -171,8 +171,13 @@ return { q: `${a} ${symbol} ${b}`, a: res };
 }
 
 function toggleModeOptions() {
-document.getElementById("mcqOptions").style.display =
-    document.getElementById("mode").value === "mcq" ? "block" : "none";
+  const mcqOptions = document.querySelectorAll("#mcqOptions input, #mcqOptions select, #mcqOptions button");
+
+  if (document.getElementById("mode").value === "mcq") {
+    mcqOptions.forEach(el => el.disabled = false);
+  } else {
+    mcqOptions.forEach(el => el.disabled = true);
+  }
 }
 
 // =========================
@@ -570,3 +575,75 @@ window.addEventListener("beforeunload", () => {
 stopSpeak();
 clearInterval(timerInterval);
 });
+
+(function () {
+        const display = document.getElementById('totalTimer');
+        let totalSec = 0;
+        let totalInterval = null;
+
+        function formatTime(sec) {
+          const m = Math.floor(sec / 60);
+          const s = sec % 60;
+          return m + ':' + String(s).padStart(2, '0');
+        }
+
+        function updateDisplay() {
+          if (!display) return;
+          display.textContent = '⏲ Tổng: ' + formatTime(totalSec);
+        }
+
+        function startTotalTimer() {
+          stopTotalTimer();
+          totalInterval = setInterval(() => {
+            totalSec++;
+            updateDisplay();
+          }, 1000);
+          updateDisplay();
+        }
+
+        function stopTotalTimer() {
+          if (totalInterval) {
+            clearInterval(totalInterval);
+            totalInterval = null;
+          }
+        }
+
+        function resetTotalTimer() {
+          stopTotalTimer();
+          totalSec = 0;
+          updateDisplay();
+        }
+
+        // Wrapper giúp can thiệp vào startGame / restartGame do script.js định nghĩa
+        function wrapName(name, beforeFn, afterFn) {
+          const orig = window[name];
+          if (typeof orig === 'function') {
+            window[name] = function (...args) {
+              if (typeof beforeFn === 'function') beforeFn();
+              const res = orig.apply(this, args);
+              if (typeof afterFn === 'function') afterFn();
+              return res;
+            };
+          } else {
+            // Nếu chưa tồn tại (hiếm), chờ DOMContentLoaded để thử lại
+            document.addEventListener(
+              'DOMContentLoaded',
+              () => {
+                if (typeof window[name] === 'function') wrapName(name, beforeFn, afterFn);
+              },
+              { once: true }
+            );
+          }
+        }
+
+        // Khi bấm Bắt đầu hoặc Chơi lại: reset rồi start
+        wrapName('startGame', resetTotalTimer, startTotalTimer);
+        // Khi bấm Thoát game: stop và reset
+        wrapName('restartGame', stopTotalTimer, resetTotalTimer);
+
+        // Expose để debug / control nếu cần
+        window.__totalTimer = { start: startTotalTimer, stop: stopTotalTimer, reset: resetTotalTimer };
+
+        // Khởi tạo hiển thị ban đầu
+        updateDisplay();
+      })();

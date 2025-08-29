@@ -58,7 +58,21 @@ color: #fff;
 display: flex;
 align-items: center;
 gap: 14px;
+position: relative;
 }
+
+      .total-timer {
+        position: absolute;
+        right: 12px;
+        top: 10px;
+        background: rgba(0,0,0,0.06);
+        padding: 6px 10px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-block;
+      }
+
 header h1 {
 font-size: clamp(24px, 3.2vw, 36px);
 margin: 0;
@@ -517,4 +531,6 @@ body {
   input#answer {
     width: 70vw;
   }
+
+  .total-timer { right: 8px; top: 8px; font-size: 0.85rem; }
 }
